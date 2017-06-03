@@ -457,11 +457,24 @@ var resizePizzas = function(size) {
   }
 
   // 遍历披萨的元素并改变它们的宽度
+  // function changePizzaSizes(size) {
+  //   for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
+  //     var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
+  //     var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
+  //     document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+  //   }
+  // }
   function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    // 获取所有randomPizzaContainer的元素集合，使用getElementsByClassName替代querySelectorAll
+    var _randomPizzaCollective = document.getElementsByClassName('randomPizzaContainer');
+    // 将改变披萨大小的方法移动到循环体之外
+    var dx = determineDx(_randomPizzaCollective[0], size);
+
+    if (_randomPizzaCollective) {
+      for (var i = 0, len = _randomPizzaCollective.length; i < len; i++) {
+        var newwidth = (_randomPizzaCollective[i].offsetWidth + dx) + 'px';
+        _randomPizzaCollective[i].style.width = newwidth;
+      }
     }
   }
 
@@ -516,9 +529,14 @@ function updatePositions() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var items = document.querySelectorAll('.mover');
+  // var items = document.querySelectorAll('.mover');
+  var items = document.getElementsByClassName('mover');   // 使用getElementsByClassName替代querySelectorAll
+
+  // 获取当前滚动条高度的值
+  var _scrollTop = Math.sin(document.body.scrollTop / 1250);
+
   for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    var phase = _scrollTop + (i % 5);
     items[i].style.left = 0;
     items[i].style.transform = 'translateX('+ (items[i].basicLeft + 100 * phase) + 'px)';  // 使用transform代替left
   }
@@ -533,6 +551,11 @@ function updatePositions() {
   }
 }
 
+// 动态获取页面所需要显示的披萨个数
+function getDynamicPizzaNum () {
+
+}
+
 // 在页面滚动时运行updatePositions函数
 window.addEventListener('scroll', updatePositions);
 
@@ -540,7 +563,11 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 100; i++) {
+
+  // 动态获取页面所需要显示的披萨个数
+  var _pizzaNum = Math.floor(document.body.clientHeight / s * cols);
+
+  for (var i = 0; i < _pizzaNum; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";
